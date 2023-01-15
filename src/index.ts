@@ -1,15 +1,11 @@
 import * as dotenv from 'dotenv';
-import { createServer, IncomingMessage, ServerResponse } from 'http';
+import { createServer } from 'http';
 import { env } from 'process';
+import { requestHandler } from './server/requestHandler';
 
 dotenv.config();
 
-const sendResponse = (req: IncomingMessage, res: ServerResponse) => {
-  res.writeHead(200);
-  res.end(`Server OK!`);
-};
-
-const server = createServer(sendResponse);
+const server = createServer(requestHandler);
 const port = env.PORT || 4000;
 
 server.listen(port, () =>
