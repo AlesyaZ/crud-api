@@ -5,7 +5,7 @@ import { requestHandler } from './server/requestHandler';
 
 dotenv.config();
 
-const server = createServer(requestHandler);
+export const server = createServer(requestHandler);
 const port = env.PORT || 4000;
 
 server.listen(port, () =>
