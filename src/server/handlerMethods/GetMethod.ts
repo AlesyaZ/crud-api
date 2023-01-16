@@ -1,14 +1,22 @@
 import { IncomingMessage, ServerResponse } from 'http';
-import { messagesErr } from '../../core/constants';
+import { messagesErr, userData } from '../../core/constants';
 import { errorResponse } from '../../core/response/error';
+import { methodResponse } from '../../core/response/method';
 import { ResStatusCode } from '../../core/types';
-import { validUserId } from '../validator/userId';
+import { findUserId, validId } from '../../validator/userId';
+
+const foundUser = (id: string) => {
+  const userId = userData.find((user) => user.id === id);
+  return userId;
+};
 
 export const getUser = (res: ServerResponse, id: string) => {
   try {
-    res.writeHead(ResStatusCode.OK, {
-      'Content-Type': 'application/json',
-    });
+    const userId = validId(res, id);
+    if (userId) {
+      const user = foundUser(id);
+      methodResponse(res, ResStatusCode.OK, user);
+    }
   } catch {
     errorResponse(
       res,
@@ -20,9 +28,7 @@ export const getUser = (res: ServerResponse, id: string) => {
 
 export const getAllUsers = (res: ServerResponse) => {
   try {
-    res.writeHead(ResStatusCode.OK, {
-      'Content-Type': 'application/json',
-    });
+    methodResponse(res, ResStatusCode.OK, userData);
   } catch {
     errorResponse(
       res,
@@ -36,7 +42,7 @@ export const handlerGetMethod = async (
   req: IncomingMessage,
   res: ServerResponse,
 ) => {
-  const userId = req.url ? validUserId(req.url) : null;
+  const userId = req.url ? findUserId(req.url) : null;
 
   if (userId) {
     await getUser(res, userId);
