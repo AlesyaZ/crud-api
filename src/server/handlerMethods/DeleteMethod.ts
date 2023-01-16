@@ -1,15 +1,23 @@
 import { IncomingMessage, ServerResponse } from 'http';
-import { messagesErr } from '../../core/constants';
+import { messagesErr, userData } from '../../core/constants';
 import { errorResponse } from '../../core/response/error';
+import { methodResponse } from '../../core/response/method';
 import { ResStatusCode } from '../../core/types';
-import { validUserId } from '../validator/userId';
+import { findUserId, validId } from '../../validator/userId';
+
+const deleteUserId = (id: string) => {
+  const userId = userData.findIndex((user) => user.id === id);
+  const [UserId] = userData.splice(userId, 1);
+  return UserId;
+};
 
 export const removeUser = (res: ServerResponse, id: string) => {
   try {
-    res.writeHead(ResStatusCode.No_Content, {
-      'Content-Type': 'application/json',
-    });
-    res.end(JSON.stringify(removeUser));
+    const resultId = validId(res, id);
+    if (resultId) {
+      const deleteUser = deleteUserId(id);
+      methodResponse(res, ResStatusCode.No_Content, deleteUser);
+    }
   } catch {
     errorResponse(
       res,
@@ -23,7 +31,7 @@ export const handlerDeleteMethod = async (
   req: IncomingMessage,
   res: ServerResponse,
 ) => {
-  const userId = req.url ? validUserId(req.url) : null;
+  const userId = req.url ? findUserId(req.url) : null;
 
   if (userId) {
     removeUser(res, userId);
