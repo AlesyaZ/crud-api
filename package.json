@@ -5,7 +5,7 @@
   "main": "src/index.ts",
   "scripts": {
     "start:dev": "nodemon",
-    "start:prod": "echo \"Error: no test specified\" && exit 2",
+    "start:prod": "tsc && ts-node-esm --experimental-specifier-resolution=node ./dist/index.js",
     "start:multi": "echo \"Error: no test specified\" && exit 3"
   },
   "repository": {
