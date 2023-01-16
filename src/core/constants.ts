@@ -7,3 +7,5 @@ export const messagesErr = {
   Endpoint_Error: 'Non-existing endpoints',
   Implemented_Error: 'Method is not supported',
 };
+
+export const userData = [];

@@ -1,14 +1,28 @@
 import { IncomingMessage, ServerResponse } from 'http';
-import { messagesErr } from '../../core/constants';
+import { v4 as uuidv4 } from 'uuid';
+import { messagesErr, userData } from '../../core/constants';
 import { errorResponse } from '../../core/response/error';
+import { methodResponse } from '../../core/response/method';
 import { ResStatusCode } from '../../core/types';
-import { validUserId } from '../validator/userId';
+import { getUserData } from '../../shared/getUserData';
+import { validProperty } from '../../validator/property';
+import { validUserId } from '../../validator/userId';
+import { User } from '../../core/models';
+
+const addUser = (user: User) => {
+  const userCreate = { id: uuidv4(), ...user };
+  userData.push(userCreate);
+  return userCreate;
+};
 
 export const createUser = async (req: IncomingMessage, res: ServerResponse) => {
   try {
-    res.writeHead(ResStatusCode.Created, {
-      'Content-Type': 'application/json',
-    });
+    const userData = await getUserData(req, res);
+    const userProp = validProperty(res, userData);
+    if (userProp) {
+      const user = addUser(userData);
+      methodResponse(res, ResStatusCode.Created, user);
+    }
   } catch {
     errorResponse(
       res,
@@ -25,15 +39,7 @@ export const handlerPostMethod = async (
   const userId = req.url ? validUserId(req.url) : null;
 
   if (userId) {
-    res.writeHead(ResStatusCode.Not_Found, {
-      'Content-Type': 'application/json',
-    });
-    res.end(
-      JSON.stringify({
-        code: ResStatusCode.Not_Found,
-        message: messagesErr.Endpoint_Error,
-      }),
-    );
+    errorResponse(res, ResStatusCode.Not_Found, messagesErr.Endpoint_Error);
   } else {
     createUser(req, res);
   }
