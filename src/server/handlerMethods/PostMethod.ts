@@ -6,7 +6,7 @@ import { methodResponse } from '../../core/response/method';
 import { ResStatusCode } from '../../core/types';
 import { getUserData } from '../../shared/getUserData';
 import { validProperty } from '../../validator/property';
-import { validUserId } from '../../validator/userId';
+import { findUserId } from '../../validator/userId';
 import { User } from '../../core/models';
 
 const addUser = (user: User) => {
@@ -36,7 +36,7 @@ export const handlerPostMethod = async (
   req: IncomingMessage,
   res: ServerResponse,
 ) => {
-  const userId = req.url ? validUserId(req.url) : null;
+  const userId = req.url ? findUserId(req.url) : null;
 
   if (userId) {
     errorResponse(res, ResStatusCode.Not_Found, messagesErr.Endpoint_Error);

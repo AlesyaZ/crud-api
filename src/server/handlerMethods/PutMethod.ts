@@ -1,8 +1,18 @@
 import { IncomingMessage, ServerResponse } from 'http';
-import { messagesErr } from '../../core/constants';
+import { messagesErr, userData } from '../../core/constants';
+import { User } from '../../core/models';
 import { errorResponse } from '../../core/response/error';
+import { methodResponse } from '../../core/response/method';
 import { ResStatusCode } from '../../core/types';
-import { validUserId } from '../validator/userId';
+import { getUserData } from '../../shared/getUserData';
+import { validProperty } from '../../validator/property';
+import { findUserId, validId } from '../../validator/userId';
+
+const putUser = (id: string, user: User) => {
+  const userId = userData.findIndex((user) => user.id === id);
+  userData[userId] = { id, ...user };
+  return userData[userId];
+};
 
 export const updateUser = async (
   req: IncomingMessage,
@@ -10,10 +20,15 @@ export const updateUser = async (
   id: string,
 ) => {
   try {
-    res.writeHead(ResStatusCode.OK, {
-      'Content-Type': 'application/json',
-    });
-    res.end(JSON.stringify(updateUser));
+    const resultId = validId(res, id);
+    if (resultId) {
+      const userData = await getUserData(req, res);
+      const userProp = validProperty(res, userData);
+      if (userProp) {
+        const updateUser = putUser(id, userData);
+        methodResponse(res, ResStatusCode.OK, updateUser);
+      }
+    }
   } catch {
     errorResponse(
       res,
@@ -27,7 +42,7 @@ export const handlerPutMethod = async (
   req: IncomingMessage,
   res: ServerResponse,
 ) => {
-  const userId = req.url ? validUserId(req.url) : null;
+  const userId = req.url ? findUserId(req.url) : null;
 
   if (userId) {
     updateUser(req, res, userId);
