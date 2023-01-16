@@ -1,19 +1,23 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import { ResStatusCode } from '../core/types';
-import { messagesErr } from '../core/constants';
+import { saveUsers, messagesErr, userData } from '../core/constants';
 import { handlerGetMethod } from './handlerMethods/GetMethod';
 import { handlerPostMethod } from './handlerMethods/PostMethod';
 import { handlerPutMethod } from './handlerMethods/PutMethod';
 import { handlerDeleteMethod } from './handlerMethods/DeleteMethod';
 import { errorResponse } from '../core/response/error';
+import { User } from '../core/models';
 
 export const requestHandler = async (
   req: IncomingMessage,
   res: ServerResponse,
+  usersData: User[],
 ) => {
   try {
+    saveUsers(usersData);
     const { url, method } = req;
     const userURL = /\/api\/users/.test(url);
+
     if (url && !url.startsWith('/api/users') && !userURL) {
       errorResponse(res, ResStatusCode.Not_Found, messagesErr.Endpoint_Error);
       return;
@@ -46,4 +50,5 @@ export const requestHandler = async (
       messagesErr.Server_Error,
     );
   }
+  return userData;
 };

@@ -1,3 +1,5 @@
+import { User } from './models';
+
 export const messagesErr = {
   UserId_Error: 'User does not exist with this id',
   User_Error: 'User is invalid',
@@ -8,4 +10,8 @@ export const messagesErr = {
   Implemented_Error: 'Method is not supported',
 };
 
-export const userData = [];
+export let userData: User[] = [];
+
+export function saveUsers(user: User[]) {
+  return (userData = [...user]);
+}
