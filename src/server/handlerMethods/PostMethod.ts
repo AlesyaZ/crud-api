@@ -1,5 +1,6 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import { messagesErr } from '../../core/constants';
+import { errorResponse } from '../../core/response/error';
 import { ResStatusCode } from '../../core/types';
 import { validUserId } from '../validator/userId';
 
@@ -9,14 +10,10 @@ export const createUser = async (req: IncomingMessage, res: ServerResponse) => {
       'Content-Type': 'application/json',
     });
   } catch {
-    res.writeHead(ResStatusCode.Internal_Server_Error, {
-      'Content-Type': 'application/json',
-    });
-    res.end(
-      JSON.stringify({
-        code: ResStatusCode.Internal_Server_Error,
-        message: messagesErr.Server_Error,
-      }),
+    errorResponse(
+      res,
+      ResStatusCode.Internal_Server_Error,
+      messagesErr.Server_Error,
     );
   }
 };

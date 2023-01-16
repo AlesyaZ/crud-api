@@ -1,5 +1,6 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import { messagesErr } from '../../core/constants';
+import { errorResponse } from '../../core/response/error';
 import { ResStatusCode } from '../../core/types';
 import { validUserId } from '../validator/userId';
 
@@ -14,14 +15,10 @@ export const updateUser = async (
     });
     res.end(JSON.stringify(updateUser));
   } catch {
-    res.writeHead(ResStatusCode.Internal_Server_Error, {
-      'Content-Type': 'application/json',
-    });
-    res.end(
-      JSON.stringify({
-        code: ResStatusCode.Internal_Server_Error,
-        message: messagesErr.Server_Error,
-      }),
+    errorResponse(
+      res,
+      ResStatusCode.Internal_Server_Error,
+      messagesErr.Server_Error,
     );
   }
 };
@@ -35,14 +32,6 @@ export const handlerPutMethod = async (
   if (userId) {
     updateUser(req, res, userId);
   } else {
-    res.writeHead(ResStatusCode.Not_Found, {
-      'Content-Type': 'application/json',
-    });
-    res.end(
-      JSON.stringify({
-        code: ResStatusCode.Not_Found,
-        message: messagesErr.Endpoint_Error,
-      }),
-    );
+    errorResponse(res, ResStatusCode.Not_Found, messagesErr.Endpoint_Error);
   }
 };
